@@ -1,0 +1,63 @@
+Bash II ukoly
+
+1. Grepování yamlů
+Procvič si příkazy jako ls, wc, grep a jak je spojit dohromady.
+Stáhni a rozbal si tyto archivy s informacemi o komunitních akcích: kurzech/srazech PyLadies a srazech Pyvo.
+$ wget -O pyladies-cz.zip https://github.com/PyLadiesCZ/pyladies.cz/archive/master.zip
+$ unzip pyladies-cz.zip
+$ wget -O pyvo-data.zip https://github.com/pyvec/pyvo-data/archive/master.zip
+$ unzip pyvo-data.zip
+
+Data si prohlédni a zjisti, co se v nich skrývá za informace. Zvlášť doporučuju prohlédnout soubor pyvo-data-master/series/brno-pyvo/events/2018-10-25-casove.yaml který je použit na stránce pyvo.cz/brno-pyvo/2018-10/, a soubor pyladies.cz-master/teams/brno.yml který je použit na stránce pyladies.cz/brno/#team.
+Použij základní shellové příkazy (ne Python) na zodpovězení otázek níže. Hledáš jen orientační hodnoty; nemusí to být na 100% přesné.
+YAML soubory by se správně měly číst knihovnou na YAML, aby byla zachována struktura. Ty je ale ber jako "čistý text", kde hledané informace jsou na řádcích ve tvaru klíč: hodnota (případně s nějakýma mezerama a/nebo pomlčkama navíc). Proto odpovědi nemusí být na 100% přesné.
+"Zakomentované" informace (začínající #) můžeš pro jednoduchost počítat taky. (I když jich je po COVIDu často víc než těch nezakomentovaných.)
+
+1.	Kolik bylo Pyv v Brně? 
+o	Pro každý sraz existuje soubor. ls *.yaml | wc -l      Bylo jich 144
+2.	Kolik bylo Pyv celkem? ls -F *-pyvo/events/ | wc -l   Bylo jich 521. Prozkoumej vše ve složkách končících -pyvo -jejich podsložkách events. A řekni mi, kolik je tam řádků
+3.	Z kolika přednášek na Pyvech jsou videa? (Předpokládej že každá přednáška může mít max. 1 video)
+o	Videa jsou označena video: grep -w video *-pyvo/events/* | wc -l   Bylo jich 434
+4.	Kolik bylo kurzů/srazů PyLadies? grep -w name *.yml | wc -l
+o	Srazy jsou v adresáři meetups/ a každý má jméno, name:
+5.	(Bonusová výzva) Z kolika Pyv jsou videa?
+Nápověda
+Šablonami jako adresar/*/podadresar/* můžeš vybrat soubory z více adresářů.
+Příkaz grep má zajímavé přepínače -r, -l/-L, -h/-H a -e.
+2. Uniq
+Příkaz uniq odstraní po sobě jdoucí duplikované řádky:
+$ echo '
+> jedna
+> dva
+> dva
+> tři
+> tři
+> tři
+> jedna
+> ' | uniq
+
+jedna
+dva
+tři
+jedna
+Často se používá sort | uniq, aby se stejné řádky z celého souboru dostaly k sobě.
+Použij uniq k zodpovězení těchto otázek:
+1.	Vypiš všechna místa konání Pyv (stačí mít v rámci každého řádku identifikátor jako artbar).
+ve složce pivo-data-master/cities zadat příkaz ls | uniq
+Pokuď jste chtěli města, tak:
+a nebo grep -w city *-pyvo/events/* > log.txt
+cat log.txt | grep -oE '[^ ]+$'| sort | uniq    vypíše jich to 12, ale správně je jen 10, protože tam je ještě the a you, které jsou navíc
+
+A pokud jste chtěli bary tak:
+grep -w venue *-pyvo/events/* > mista.txt
+cat mista.txt | grep -oE '[^ ]+$'| sort | uniq 
+
+
+2.	Přidej informaci o tom, kolikrát na kterém místě Pyvo bylo.
+Příkaz uniq má zajímavý přepínač -c.
+cat mista.txt | grep -oE '[^ ]+$'| sort | uniq -c
+Bonusová výzva
+Existuje zajímavý příkaz cut, který má zajímavé přepínače -d a -f.
+1.	Jaké jsou 3 nejčastější křestní jména organizátorů/koučů/atd. PyLadies?
+
+
