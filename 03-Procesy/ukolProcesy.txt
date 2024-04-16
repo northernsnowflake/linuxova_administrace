@@ -1,4 +1,4 @@
-Úkoly - Zápis údajů o procesech
+	Úkoly - Zápis údajů o procesech
 Na začátku si vytvořte dočasnou složku, ať si zbytečně neděláte nepořádek v souborovém systému. Přesuňte se do této složky.
 
 Vytvořte složku root a složku s názvem vašeho uživatele (s tím vám může pomoct proměnná $USER). Po zadání příkazu tree by ste měli vidět něco podobného:
