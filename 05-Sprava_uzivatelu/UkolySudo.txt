@@ -1,0 +1,91 @@
+Jak se pouští sudo
+Nakresli diagram toho, jak se pouští procesy pro příkaz sudo ps:
+
+sudo ps
+    PID TTY          TIME CMD
+2501386 pts/9    00:00:00 sudo
+2501388 pts/9    00:00:00 ps
+
+
+Myslím, že se stane to, že se spustí program sudo a pak se spustí program ps. A čeká se, než se program ps ukončí. Bash pak čeká na další příkaz.
+
+sudo
+-----------
+   |----
+    ps 
+
+Sudo zapomíná
+
+(sudo ti dává oprávnění, ale i zodpovědnost. Nauč se před každým použitím sudo přečíst spouštěný příkaz a zamyslet se, jestli ho opravdu chceš spustit. Ale opět, neboj se experimentovat – na virtuálním počítači není co zkazit.)
+
+Co by měl dělat tento příkaz?
+
+ll /var/db/sudo/lectured/
+
+kata@fedora:~$ ll /var/db/sudo/lectured
+ls: cannot access '/var/db/sudo/lectured': Permission denied
+- nejsou oprávnění
+
+- přidala jsem nejprve práva na čtení '+r' složce sudo pomocí 'sudo chmod +r sudo'
+- pak cd sudo a přidala jsem práva na spuštění 'sudo chmod +w lectured'
+- ve složce je složka 1000 a 1001
+
+kata@fedora:/var/db/sudo/lectured$ ll
+total 0
+-rw-------. 1 root kata  0 Mar 15 20:26 1000
+-rw-------. 1 root test1 0 Apr 17 19:35 1001
+
+
+Příkaz ale pod běžným uživatelským účtem nefunguje; potřebuješ sudo ll /var/db/sudo/lectured/. To ale taky nefunguje. Proč? Jak to spravit?
+
+Jaké soubory jsou v /var/db/sudo/lectured/? Komu patří? Jak jsou velké?
+- patří rootu a skupině kata (1000) a rootu ve skupině test1 (1001)
+- root je super user, a ty složky jsou číselné označení uživatele kata a test1
+- velikost obou je 0 (jsou to prázdné soubory
+- velikost je ten 4. sloupec v příkazu ll
+
+
+Jaké soubory jsou v /var/run/sudo/ts? Komu patří? Jak jsou velké? Kdo k nim má jaká práva?
+
+kata@fedora:/var/run/sudo/ts$ ll
+total 4
+-rw-------. 1 root kata 112 Apr 18 14:51 1000
+- je tam jeden soubor '1000' a patří rootu ve skupině kata. Má k němu práva číst a psát uživatel (tedy káťa)  
+
+Jak by vypadal příkaz, který smaže „tvůj“ soubor v /var/run/sudo/ts?
+
+- rm 1000
+
+
+Když spustíš příkaz sudo, zeptá se tě na heslo. Když ho spustíš podruhé (ve stejném terminálu), už se neptá – pamatuje si, že jsi heslo před chvilkou zadala.
+
+Vyzkoušej si ale, že tohle nefunguje s příkazem pro smazání „tvého“ souboru v /var/run/sudo/ts. Když ho pustíš několikrát za sebou, sudo se vždycky znovu zeptá na heslo.
+
+Proč?
+- po smazání sudo rm 1000 se soubor nezeptal na heslo a hned ho smazal. Heslo jsem už zadala dříve
+Zadej tyhle příkazy:
+
+Smaž „svůj“ soubor z /var/db/sudo/lectured/. Done - tady už se zeptal na heslo, a pak soubor smazal pomocí 'sudo rm 1000'
+Smaž „svůj“ soubor z /var/run/sudo/ts. Done - opět ve složce 'sudo rm 1000', hned se smazal, ani jsem nezadávala heslo
+Spusť sudo echo.
+A odpověz:
+
+Co je u sudo echo jinak? Sudo echo vypsalo prázdný řádek. 
+K čemu slouží soubory ve /var/db/sudo/lectured/?
+
+- ještě k tomu, co znamenají - na internetu se píše, že jde o stav, kdo akceptoval (komu byla zobrazena tato lekce:
+kata@fedora:/var/db/sudo$ sudo echo lectured
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+For security reasons, the password you type will not be visible.
+
+[sudo] password for kata: 
+lectured
+
+a po tomto příkazu se znovu zobrazí file 1000, i když jsem ho již smazala, tj. tato informace se někam zapíše, že uživateli 1000 byla zobrazena informace o důvěře.
