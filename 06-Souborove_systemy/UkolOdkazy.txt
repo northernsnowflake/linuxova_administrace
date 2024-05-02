@@ -1,0 +1,34 @@
+Úkoly - Odkazy
+Bezedný adresář
+Vytvoř si nový, prázdný adresář, přejdi do něj a zadej:
+$ mkdir bezedny
+$ ln -s . bezedny/bezedny  vytvořil se symbolický link na bezedný seznam, existuje spostu  
+                           zanoření, všechny složky se jmenují bezedny
+$ ls -l bezedny/           zobrazí se, total 4
+                           lrwxrwxrwx. 1 kata kata 1 May  2 14:06 bezedny -> .
+
+
+Zkus si:
+$ ls -l bezedny/tabtabtab
+$ tree bezedny
+$ tree -l bezedny          vypsalo se další zanoření
+Co se právě stalo?
+kata@fedora:~/bezedny$ tree -l bezedny
+bezedny
+└── bezedny -> .
+    └── bezedny -> .  [recursive, not followed]
+
+
+
+Na tohle je dobré dávat pozor, až budeš psát program, který prochází adresářové struktury. Vždy si ověř, že neprocházíš donekonečna jeden adresář.
+Viz zde
+A co se stane tady?
+$ ln -s tu tu  symbolic link, ale je to červeně, protože složka tu neexistuje a odkaz na složku tu není správně
+$ ls -l tu vypíše 
+$ cat tu
+
+kata@fedora:~$ ls -l tu
+lrwxrwxrwx. 1 kata kata 2 May  2 14:10 tu -> tu
+kata@fedora:~$ cat tu
+cat: tu: Too many levels of symbolic links
+
